@@ -11,7 +11,7 @@ class Tree {
 public:
     Tree();
 
-    Tree(Game *config);
+    Tree(Game *config, int depth);
 
     virtual ~Tree();
 
@@ -36,7 +36,12 @@ public:
 
     float confidence;
 
+    // debuging display
+    void gamePrettyPrinter();
+
     inline static long count = 0;
+
+    int depth;
 
 protected:
     long id;

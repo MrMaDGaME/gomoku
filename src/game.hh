@@ -28,10 +28,6 @@ public:
     // testing purpose
     void set_piece(int player, int x, int y);
 
-    int possible_move[BOARD_SIZE * BOARD_SIZE];
-
-    int nb_possible_move;
-
     int mandatory_moves[BOARD_SIZE * BOARD_SIZE];
 
     int nb_mandatory_moves = 0;

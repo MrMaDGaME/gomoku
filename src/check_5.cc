@@ -1,5 +1,5 @@
 #include "game.hh"
-#include <stddef.h>
+#include <cstddef>
 
 int Game::check(t_dim dim, t_point p, t_vec vec) const {
     if (vec.i == 1)
@@ -46,6 +46,6 @@ bool Game::check_success(int current_player) {
         row++;
     }
     if (success)
-        nb_possible_move = 0;
+        nb_mandatory_moves = 0;
     return success;
 }

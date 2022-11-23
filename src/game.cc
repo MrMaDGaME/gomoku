@@ -1,25 +1,18 @@
 #include "game.hh"
 
-Game::Game() : nb_possible_move(BOARD_SIZE * BOARD_SIZE), player(1), last_move(0),
-               nb_mandatory_moves(0) {
+Game::Game() : player(1), last_move(0), nb_mandatory_moves(1) {
     for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
         board[i] = 0;
-        possible_move[i] = i;
         mandatory_moves[i] = 0;
     }
+    mandatory_moves[0] = get_index(10, 10);
 }
 
-Game::Game(Game previous, int move) : nb_possible_move(previous.nb_possible_move - 1),
-                                      last_move(move) {
+Game::Game(Game previous, int move) : last_move(move) {
     const int *prev = previous.getBoard();
-    int j = 0;
     for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
         board[i] = prev[i];
         mandatory_moves[i] = 0;
-        if (board[i] == 0 && i != move) {
-            possible_move[j] = i;
-            j++;
-        }
     }
     player = 3 - previous.getPlayer();
     board[move] = player;

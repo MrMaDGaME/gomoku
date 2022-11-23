@@ -2,11 +2,11 @@
 
 #define DURATION 4
 
-Tree::Tree() : id(count++ % MAX_NODES) {
+Tree::Tree() : id(count++ % MAX_NODES), depth(0) {
     games[id] = new Game();
 }
 
-Tree::Tree(Game *config) : id(count++ % MAX_NODES) {
+Tree::Tree(Game *config, int depth) : id(count++ % MAX_NODES), depth(depth) {
     games[id] = config;
 }
 
@@ -19,7 +19,7 @@ Game &Tree::getGame() const {
 }
 
 Tree &Tree::createChild(int move) {
-    children.push_back(new Tree(new Game(getGame(), move)));
+    children.push_back(new Tree(new Game(getGame(), move), depth + 1));
     return *children.at(children.size() - 1);
 }
 
@@ -48,7 +48,7 @@ int Tree::select() {
     int winner;
     // Select
     int T = 2;
-    if (!children.empty() && total_visit < T) {
+    if (!children.empty() && total_visit > T) {
         float confidence_max = 0;
         int max_index = 0;
         for (size_t i = 0; i < children.size(); i++) {
@@ -63,7 +63,7 @@ int Tree::select() {
         winner = getChildren(max_index).select();
     }
         // Simulate expand and check_success
-    else if (getGame().nb_possible_move > 0) {
+    else if (getGame().nb_mandatory_moves > 0) {
         if (getGame().check_success(1)) {
             winner = 1;
         }
@@ -72,15 +72,13 @@ int Tree::select() {
         }
         else {
             std::srand(std::time(nullptr));
-            int move;
-            // mandatory moves
-            if (getGame().nb_mandatory_moves) {
-                move = getGame().mandatory_moves[std::rand() % getGame().nb_mandatory_moves];
+            int move_index = std::rand() % getGame().nb_mandatory_moves;
+            int move = getGame().mandatory_moves[move_index];
+            // Suppressing move from move list
+            for (int i = move_index; i < getGame().nb_mandatory_moves - 1; i++) {
+                getGame().mandatory_moves[i] = getGame().mandatory_moves[i + 1];
             }
-                // random moves
-            else {
-                move = getGame().possible_move[std::rand() % getGame().nb_possible_move];
-            }
+            getGame().nb_mandatory_moves--;
             winner = createChild(move).select();
         }
     }
@@ -110,9 +108,22 @@ Tree::~Tree() {
             delete (child);
         }
     }
-    count--;
 }
 
 void Tree::setKeeper(Tree *keeper_) {
     Tree::keeper = keeper_;
+}
+
+void Tree::gamePrettyPrinter() {
+    std::cout << "depth : " << depth << std::endl;
+    std::cout << "id : " << id << std::endl;
+    std::cout << "count : " << count << std::endl;
+    std::cout << "PARENT:" << std::endl;
+    getGame().display();
+    std::cout << "=======================" << std::endl << children.size() << " CHILDRENS:"
+              << std::endl;
+    for (Tree *child: children) {
+        child->getGame().display();
+        std::cout << "~~~~~~~~~~~~" << std::endl;
+    }
 }
